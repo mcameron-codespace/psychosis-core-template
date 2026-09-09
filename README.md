@@ -73,6 +73,28 @@ GOOGLE_CLIENT_SECRET=xxx
 - Enable SSL/TLS encryption for database connections in production
 - Review the security documentation for deployment best practices
 
+### Database Connection Encryption
+
+All database connections are configured with encryption enabled by default:
+
+**PostgreSQL Connections:**
+- `SSL Mode=Require` is set to enforce encrypted connections
+- Ensure your PostgreSQL server is configured with valid SSL certificates
+- For production, consider setting `SSL Mode=VerifyFull` for additional certificate validation
+
+**SQL Server Connections:**
+- `Encrypt=True` enables TLS encryption for all database communications
+- `TrustServerCertificate=False` ensures certificate chain validation
+- For production deployments, use certificates from trusted Certificate Authorities
+- Azure SQL Database connections include proper encryption settings by default
+
+**Production Deployment Requirements:**
+1. Use valid SSL/TLS certificates from trusted authorities
+2. Never disable certificate validation (`TrustServerCertificate=False`)
+3. Ensure database servers require encrypted connections
+4. Regularly rotate database credentials and certificates
+5. Monitor connection logs for encryption-related warnings or errors
+
 ## Publish on IIS - What works for me on my Windows Server 2016 & SQL Server 2014 (Enkodellc)
 1. Publish BlazorBoilerplate.Server project to your IIS website folder.
 2. Install your SSL. Make sure your SSL is in the **WebHosting** Certificate Store, and in Linux **My** Certificate Store.
