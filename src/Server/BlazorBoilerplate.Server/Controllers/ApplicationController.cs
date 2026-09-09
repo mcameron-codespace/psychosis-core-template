@@ -15,6 +15,7 @@ namespace BlazorBoilerplate.Server.Controllers
     [Route("api/data/[action]")]
     [Authorize]
     [BreezeQueryFilter]
+    [AutoValidateAntiforgeryToken] // Task 5: CSRF protection for all POST/PUT/DELETE actions
     public class ApplicationController : Controller
     {
         private readonly ApplicationPersistenceManager persistenceManager;
