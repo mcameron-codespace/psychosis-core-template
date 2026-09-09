@@ -313,8 +313,9 @@ namespace BlazorBoilerplate.Server
                 options.Password.RequireLowercase = RequireLowercase;
                 //options.Password.RequiredUniqueChars = 6;
 
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                options.Lockout.MaxFailedAccessAttempts = 10;
+                // Enhanced lockout settings for better security (Task 8)
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(60);
+                options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
                 if (Convert.ToBoolean(Configuration[$"{projectName}:RequireConfirmedEmail"] ?? "false"))

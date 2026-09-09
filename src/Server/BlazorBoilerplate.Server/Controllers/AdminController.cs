@@ -19,6 +19,7 @@ namespace BlazorBoilerplate.Server.Controllers
     [OpenApiIgnore]
     [Route("api/[controller]")]
     [ApiController]
+    [AutoValidateAntiforgeryToken] // Task 5: CSRF protection for all POST/PUT/DELETE actions
     public class AdminController : ControllerBase
     {
         private readonly IMapper _autoMapper;

@@ -1,45 +1,89 @@
 ```
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
+*.jar
+*.war
+*.class
+*.o
+*.obj
+*.out
+
 # Dependencies
 node_modules/
 packages/
-
-# Build outputs
-bin/
-obj/
-out/
-dist/
-build/
-target/
+vendor/
 
 # Logs
 *.log
+logs/
 
-# Environment specific
+# Environment
 .env
 .env.local
-*.env.*
+.env.*
+!*.env.example
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# Python
+# Test and coverage
+coverage/
+htmlcov/
+.coverage
+*.gcov
+*.profdata
+
+# Distribution
+dist/
+build/
+target/
+_output/
+
+# Python specific
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 *.so
+*.egg-info/
+.eggs/
 
-# Dotnet
-**/Debug/
-**/Release/
-*.userprefs
-[vV]isual[Ss]tudio[Aa]nywhere/
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
