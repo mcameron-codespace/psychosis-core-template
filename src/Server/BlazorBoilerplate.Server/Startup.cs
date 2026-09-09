@@ -391,13 +391,28 @@ namespace BlazorBoilerplate.Server
                     ss.Formatting = Newtonsoft.Json.Formatting.Indented; // format JSON for debugging
                 }
             })   // Add Breeze exception filter to send errors back to the client
-            .AddMvcOptions(o => { o.Filters.Add(new GlobalExceptionFilter()); })
+            .AddMvcOptions(o => 
+            { 
+                o.Filters.Add(new GlobalExceptionFilter());
+                // Enable CSRF protection globally for all POST/PUT/DELETE requests
+                o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            })
             .AddViewLocalization().AddDataAnnotationsLocalization(options =>
             {
                 options.DataAnnotationLocalizerProvider = (type, factory) =>
                 {
                     return factory.Create(typeof(Global));
                 };
+            });
+
+            // Configure antiforgery token settings
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.Cookie.Name = "XSRF-TOKEN";
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.HttpOnly = false; // Allow JavaScript to read the token
+                options.Cookie.SameSite = SameSiteMode.Strict;
             });
             //.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LocalizationRecordValidator>());
 
@@ -467,8 +482,33 @@ namespace BlazorBoilerplate.Server
                 var httpClientHandler = new HttpClientHandler() { UseCookies = false };
                 if (_environment.IsDevelopment())
                 {
-                    // Return 'true' to allow certificates that are untrusted/invalid
-                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                    // Development environment: Allow self-signed certificates for local development
+                    // In production, proper certificate validation should be enforced
+                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => 
+                    { 
+                        // Log certificate validation failures for security monitoring
+                        if (errors != System.Net.Security.SslPolicyErrors.None)
+                        {
+                            var logger = s.GetService<ILogger<Startup>>();
+                            logger?.LogWarning("SSL Certificate validation failed for {Host}: {Errors}", 
+                                message.RequestMessage?.RequestUri, errors);
+                        }
+                        return true; 
+                    };
+                }
+                else
+                {
+                    // Production environment: Enforce proper SSL certificate validation
+                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => 
+                    { 
+                        if (errors != System.Net.Security.SslPolicyErrors.None)
+                        {
+                            var logger = s.GetService<ILogger<Startup>>();
+                            logger?.LogError("SSL Certificate validation failed for {Host}: {Errors}", 
+                                message.RequestMessage?.RequestUri, errors);
+                        }
+                        return errors == System.Net.Security.SslPolicyErrors.None; 
+                    };
                 }
                 var client = new HttpClient(httpClientHandler);
                 if (cookies.Any())

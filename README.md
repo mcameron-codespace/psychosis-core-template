@@ -41,10 +41,37 @@ Complete all Blazor dependencies.
 ### How to run
 1. Install the **Visual Studio 2022 (v17.0.1 at minimum)**
 2. Clone or download.
-3. Review / Update appsettings.json - DefaultConnection.
+3. **Security Setup**: 
+   - Copy `appsettings.json.example` to `appsettings.json` in the Server project
+   - Create a `.env` file from `.env.example` and set your environment variables (especially database passwords)
+   - Update connection strings with your database credentials using environment variables
 4. Open the solution in Visual Studio and press F5.
 5. To view the API using Swagger UI, Run the solution and go to: [http://localhost:53414/swagger/index.html](http://localhost:53414/swagger/index.html). Live example:
 [https://blazorboilerplate.com/swagger/index.html](https://blazorboilerplate.com/swagger/index.html)
+
+#### Environment Variables Configuration
+
+The application now uses environment variables for sensitive configuration. Create a `.env` file in the root directory based on `.env.example`:
+
+```bash
+# Required: PostgreSQL password
+POSTGRES_PASSWORD=your_secure_password_here
+
+# Optional: Azure Key Vault settings
+AZURE_KEY_VAULT_URI=https://<YOUR_VAULTNAME_HERE>.vault.azure.net/
+AZURE_CLIENT_ID=<YOUR_CLIENT_ID>
+AZURE_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+
+# Optional: External Auth Providers
+GOOGLE_CLIENT_ID=xxx
+GOOGLE_CLIENT_SECRET=xxx
+```
+
+**Important Security Notes:**
+- Never commit `.env` files or `appsettings.json` with real credentials to version control
+- Use strong passwords (minimum 12 characters with uppercase, lowercase, numbers, and special characters)
+- Enable SSL/TLS encryption for database connections in production
+- Review the security documentation for deployment best practices
 
 ## Publish on IIS - What works for me on my Windows Server 2016 & SQL Server 2014 (Enkodellc)
 1. Publish BlazorBoilerplate.Server project to your IIS website folder.

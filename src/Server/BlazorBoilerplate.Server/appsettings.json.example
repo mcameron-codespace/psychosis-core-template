@@ -1,22 +1,22 @@
 {
   "ConnectionStrings": {
     "PostgresConnection": "host=localhost;database=BlazorBoilerplate;user id=postgres;password=${POSTGRES_PASSWORD};SSL Mode=Require",
-    // Azure Hosting: Use format below.
-    // "DefaultConnection": "Data Source=tcp:<SQL_SERVER_NAME>.database.windows.net,1433;Initial Catalog=<DATABASE_NAME>;Persist Security Info=False;User ID=<ADMIN_USER>;Password=<ADMIN_PASSWORD>;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;MultipleActiveResultSets=True;"
+    "// Azure Hosting: Use format below.": "",
+    "// DefaultConnection": "Data Source=tcp:<SQL_SERVER_NAME>.database.windows.net,1433;Initial Catalog=<DATABASE_NAME>;Persist Security Info=False;User ID=<ADMIN_USER>;Password=<ADMIN_PASSWORD>;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;MultipleActiveResultSets=True;"
     "DefaultConnection": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=BlazorBoilerplate;Trusted_Connection=True;MultipleActiveResultSets=true;Encrypt=True;TrustServerCertificate=False;"
   },
 
-  // Azure Hosting: Read the setup documentation at https://blazor-boilerplate.readthedocs.io/
+  "// Azure Hosting: Read the setup documentation at https://blazor-boilerplate.readthedocs.io/": "",
   "HostingOnAzure": {
     "RunsOnAzure": false,
     "RunningAsAppService": true,
-    "RunningAsDocker": false, // not implemented yet
+    "RunningAsDocker": false,
     "AzureKeyVault": {
       "UsingKeyVault": true,
       "UseManagedAppIdentity": true,
-      "AppKey": "", // not implemented yet
-      "AppSecret": "",
-      "KeyVaultUri": "https://<YOUR_VAULTNAME_HERE>.vault.azure.net/",
+      "AppKey": "",
+      "AppSecret": "${AZURE_CLIENT_SECRET}",
+      "KeyVaultUri": "${AZURE_KEY_VAULT_URI}",
       "CertificateIdentifier": "https://<YOUR_VAULTNAME_HERE>.vault.azure.net/certificates/BBAUTH/<HEX_VERSION_STRING_HERE>",
       "CertificateName": "BBAUTH",
       "StorageAccountBlobBaseUrl": "https://<YOUR_STORAGE_ACCOUNT_NAME_HERE>.blob.core.windows.net",
@@ -28,29 +28,29 @@
   "ExternalAuthProviders": {
     "Google": {
       "Enabled": false,
-      "ClientId": "xxx",
-      "ClientSecret": "xxx"
+      "ClientId": "${GOOGLE_CLIENT_ID}",
+      "ClientSecret": "${GOOGLE_CLIENT_SECRET}"
     },
     "Facebook": {
       "Enabled": false,
-      "AppId": "xxx",
-      "AppSecret": "xxx"
+      "AppId": "${FACEBOOK_APP_ID}",
+      "AppSecret": "${FACEBOOK_APP_SECRET}"
     },
     "Twitter": {
       "Enabled": false,
-      "ConsumerKey": "xxx",
-      "ConsumerSecret": "xxx"
+      "ConsumerKey": "${TWITTER_CONSUMER_KEY}",
+      "ConsumerSecret": "${TWITTER_CONSUMER_SECRET}"
     },
     "Apple": {
       "Enabled": false,
-      "ClientId": "xxx",
-      "KeyId": "xxx",
-      "TeamId": "xxx"
+      "ClientId": "${APPLE_CLIENT_ID}",
+      "KeyId": "${APPLE_KEY_ID}",
+      "TeamId": "${APPLE_TEAM_ID}"
     },
     "Microsoft": {
       "Enabled": false,
-      "ClientId": "xxx",
-      "ClientSecret": "xxx"
+      "ClientId": "${MICROSOFT_CLIENT_ID}",
+      "ClientSecret": "${MICROSOFT_CLIENT_SECRET}"
     }
   },
 
@@ -69,7 +69,7 @@
     "UsePostgresServer": false,
     "IS4ApplicationUrl": "https://www.blazorboilerplate.com",
     "UseLocalCertStore": false,
-    "CertificateThumbprint": "PutYourSSLThumbPrintHere", // Azure Hosting: X.509 SHA-1 Thumbprint (in hex) from Azure Key Vault in Azure Portal.
+    "CertificateThumbprint": "${SSL_CERTIFICATE_THUMBPRINT}",
     "CookieExpireTimeSpanDays": 30
   },
 
@@ -83,7 +83,7 @@
     "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.MSSQLServer" ],
     "Enrich": [ "FromLogContext", "WithMachineName", "WithProcessId", "WithThreadId" ],
     "MinimumLevel": {
-      "Default": "Warning", // Azure Hosting: Can be useful to set to 'Debug' during setup
+      "Default": "Warning",
       "Override": {
         "Microsoft": "Warning",
         "System": "Warning",
@@ -92,12 +92,10 @@
     },
     "WriteTo": [
       {
-        // If you're not using mssql as a backend db either remove this section or just make sure that the target connection string is not blank
-        // Does not throw exception if connection string is invalid, only if it doesn't exist
-        "Name": "MSSqlServer", // see https://github.com/serilog/serilog-sinks-mssqlserver/blob/dev/README.md for additional config options
+        "Name": "MSSqlServer",
         "Args": {
           "connectionString": "DefaultConnection",
-          "tableName": "Logs", // Table Defined in BlazorBoilerplate.Shared/DataModels/Logs.cs
+          "tableName": "Logs",
           "autoCreateSqlTable": false,
           "restrictedToMinimumLevel": "Warning"
         }
@@ -119,7 +117,6 @@
           "retainedFileCountLimit": 5
         }
       }
-      //,{"Name": "Console"} //Helpful when Debugging
     ]
   },
   "AllowedHosts": "*"

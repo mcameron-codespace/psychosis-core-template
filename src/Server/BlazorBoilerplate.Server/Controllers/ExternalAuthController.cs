@@ -29,11 +29,17 @@ namespace BlazorBoilerplate.Server.Controllers
         {
             if (string.IsNullOrEmpty(returnUrl)) returnUrl = "~/";
 
-            // validate returnUrl - either it is a valid OIDC URL or back to a local page
-            if (Url.IsLocalUrl(returnUrl) == false && !returnUrl.Contains(Request.Host.Value))
+            // validate returnUrl - implement whitelist-based validation for enhanced security
+            if (!IsValidReturnUrl(returnUrl))
             {
-                // user might have clicked on a malicious link - should be logged
-                throw new Exception("invalid return URL");
+                // Log potential open redirect attack attempt
+                var logger = HttpContext.RequestServices.GetService<ILogger<ExternalAuthController>>();
+                logger?.LogWarning("Potential open redirect attack detected. Rejected return URL: {ReturnUrl} from IP: {RemoteIP}", 
+                    returnUrl, 
+                    HttpContext.Connection.RemoteIpAddress?.ToString());
+                
+                // Redirect to safe default location instead of throwing exception
+                return RedirectToAction("Index", "Home");
             }
 
             if (AccountOptions.WindowsAuthenticationSchemeName == provider)
@@ -114,5 +120,56 @@ namespace BlazorBoilerplate.Server.Controllers
         public async Task<IActionResult> ExternalSignIn()
         => Redirect(await _externalAuthManager.ExternalSignIn(HttpContext));
 
+        /// <summary>
+        /// Validates return URL against open redirect attacks using multiple validation layers
+        /// </summary>
+        /// <param name="returnUrl">The return URL to validate</param>
+        /// <returns>True if the URL is safe, false otherwise</returns>
+        private bool IsValidReturnUrl(string returnUrl)
+        {
+            if (string.IsNullOrEmpty(returnUrl))
+                return false;
+
+            // Layer 1: Check if it's a local URL (built-in ASP.NET Core validation)
+            if (Url.IsLocalUrl(returnUrl))
+                return true;
+
+            // Layer 2: Prevent protocol-based attacks (javascript:, data:, etc.)
+            if (returnUrl.Contains(":", StringComparison.OrdinalIgnoreCase))
+            {
+                var scheme = returnUrl.Split(':')[0].ToLowerInvariant();
+                // Block dangerous schemes
+                if (new[] { "javascript", "data", "vbscript", "file" }.Contains(scheme))
+                    return false;
+            }
+
+            // Layer 3: Prevent double-encoding attacks
+            if (returnUrl.Contains("%2f") || returnUrl.Contains("%5c"))
+            {
+                try
+                {
+                    var decoded = Uri.UnescapeDataString(returnUrl);
+                    // Check if decoding reveals a dangerous URL
+                    if (!Url.IsLocalUrl(decoded) && !decoded.Contains(Request.Host.Value, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                }
+                catch
+                {
+                    // If decoding fails, reject the URL
+                    return false;
+                }
+            }
+
+            // Layer 4: Ensure the URL belongs to our host
+            if (returnUrl.StartsWith("/") == false && 
+                returnUrl.Contains(Request.Host.Value, StringComparison.OrdinalIgnoreCase) == false)
+                return false;
+
+            // Layer 5: Block URLs with embedded credentials (user:pass@host)
+            if (returnUrl.Contains("@"))
+                return false;
+
+            return true;
+        }
     }
 }
